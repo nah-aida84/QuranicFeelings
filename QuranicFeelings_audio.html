@@ -1,0 +1,767 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>Qur'anic Feelings</title>
+    <style>
+        :root { --theme-color: #2980b9; }
+        html, body {
+            margin: 0; padding: 0; height: 100%;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4; color: #333;
+            max-width: 400px; max-height: 600px; overflow: hidden;
+        }
+        body { display: flex; flex-direction: column; margin-left: auto; margin-right: auto; height: 100vh; background: #f4f4f4; }
+        .centered { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
+        .fade-in { animation: fadeIn 0.7s; }
+        @keyframes fadeIn { from { opacity: 0;} to { opacity: 1;} }
+        .hidden { display: none !important; }
+        header { background-color: var(--theme-color); color: white; padding: 20px 10px; text-align: center; user-select: none; flex-shrink: 0; }
+        header h1 { font-size: 4.5rem; margin: 0; line-height: 1; font-family: 'Georgia', serif; user-select: text; }
+        header h2 { margin: 6px 0 0; font-weight: normal; font-size: 1.25rem; }
+        .menu-btn { background-color: var(--theme-color); border: none; color: white; font-weight: 600; border-radius: 8px; cursor: pointer; font-size: 1.2em; margin: 12px 0; padding: 13px 40px; transition: background 0.2s; }
+        .menu-btn:hover { background: #1f618d; }
+        main { flex-grow: 1; background-color: white; padding: 15px 15px 10px 15px; overflow-y: auto; -webkit-overflow-scrolling: touch; box-sizing: border-box; }
+
+        .emotion-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+            margin-top: 6px;
+            padding: 0 6px;
+        }
+        @media (min-width: 480px) {
+            .emotion-list {
+                grid-template-columns: 1fr 1fr;
+                gap: 18px 14px;
+                padding: 0 0;
+            }
+        }
+        .emotion-btn {
+            background: linear-gradient(135deg, #3498db, #2980b9 90%);
+            border: none;
+            color: #fff;
+            font-weight: 500;
+            font-size: 1.08em;
+            border-radius: 13px;
+            box-shadow: 0 1px 6px rgba(40,80,160,0.08);
+            padding: 17px 0;
+            cursor: pointer;
+            transition: 
+                box-shadow 0.18s,
+                background 0.16s,
+                transform 0.13s;
+            outline: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-width: 0;
+            min-height: 52px;
+            user-select: none;
+            letter-spacing: 0.01em;
+        }
+        .emotion-btn:active,
+        .emotion-btn.active,
+        .emotion-btn:focus-visible {
+            background: linear-gradient(135deg, #217dbb 60%, #195e8c 100%);
+            box-shadow: 0 3px 14px rgba(41,128,185,0.14);
+            outline: 2px solid #217dbb;
+        }
+        .emotion-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #217dbb 70%, #3498db 100%);
+            box-shadow: 0 2px 10px rgba(41,128,185,0.13);
+            transform: translateY(-2px) scale(1.03);
+        }
+        .emotion-btn:disabled {
+            opacity: 0.66;
+            cursor: not-allowed;
+        }
+        @media (max-width: 400px) {
+            .emotion-btn {
+                font-size: 1em;
+                padding: 14px 0;
+                min-height: 44px;
+            }
+        }
+
+        .slide-container { background-color: #ecf0f1; border-radius: 10px; padding: 15px 20px; min-height: 320px; box-shadow: inset 0 0 8px #bbb; display: flex; flex-direction: column; justify-content: flex-start; box-sizing: border-box; }
+        .slide-verse-translation { font-style: italic; font-size: 1.1rem; margin-bottom: 10px; min-height: 100px; white-space: pre-wrap; quotes: '‘' '’'; user-select: text; }
+        .slide-verse-translation::before { content: '‘'; }
+        .slide-verse-translation::after { content: '’'; }
+        .slide-explanation { font-size: 0.95rem; line-height: 1.4; color: #2c3e50; margin-bottom: 12px; white-space: pre-wrap; user-select: text; }
+
+        .nav-slides-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
+            margin: 22px 0 8px 0;
+        }
+        .nav-btn {
+            background: #636e72;
+            color: #fff;
+            border: none;
+            border-radius: 7px;
+            padding: 7px 18px;
+            font-size: 1.3em;
+            min-width: 44px;
+            min-height: 42px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: inherit;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        #slide-indicator {
+            min-width: 50px;
+            text-align: center;
+            font-size: 1em;
+            font-weight: bold;
+            color: #2980b9;
+            user-select: none;
+            letter-spacing: 1px;
+        }
+        @media (max-width: 420px) {
+            .nav-slides-container {
+                gap: 12px;
+            }
+            #slide-indicator {
+                min-width: 32px;
+                font-size: 0.98em;
+            }
+        }
+
+        .back-btn { margin-top: 22px; padding: 10px 25px; background: #636e72; color: white; border: none; border-radius: 6px; cursor: pointer; }
+        label { display: block; margin: 10px 0 4px; font-weight: 600; }
+        select, input[type=range] { width: 100%; padding: 6px; margin-bottom: 12px; font-size: 1rem; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
+        input[type=checkbox] { margin-right: 6px; vertical-align: middle; }
+        .settings-group { margin-bottom: 15px; }
+        .about, .settings { max-width: 400px; text-align: center; color: #636e72; }
+        .video-container { position: relative; width: 100%; padding-bottom: 56.25%; height: 0; margin-top: 10px; border-radius: 10px; overflow: hidden; box-shadow: 0 0 6px rgba(0,0,0,0.15); }
+        .video-container #emotion-video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; border-radius: 10px; cursor: pointer; }
+        footer { text-align: center; padding: 8px 10px 18px; font-size: 13px; color: #666; user-select: none; flex-shrink: 0; }
+        .volume-group { margin-bottom: 14px; }
+        .volume-label { display: flex; justify-content: space-between; align-items: center; }
+
+        main, .centered {
+          width: 100%;
+          box-sizing: border-box;
+          max-width: 420px;
+          margin: 0 auto;
+        }
+        @media (min-width: 700px) {
+          html, body {
+            max-width: 500px;
+            min-height: 680px;
+            margin: 40px auto;
+            border-radius: 20px;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.13);
+            overflow: auto;
+          }
+          .slide-container {
+            min-height: 390px;
+            font-size: 1.15rem;
+          }
+          .menu-btn, .emotion-btn {
+            font-size: 1.15em;
+            padding: 16px 50px;
+            margin: 16px 0;
+          }
+          .emotion-list {
+            gap: 16px;
+          }
+          .slide-verse-translation {
+            font-size: 1.22rem;
+          }
+          .slide-explanation {
+            font-size: 1.08rem;
+          }
+          .back-btn {
+            font-size: 1.08em;
+            padding: 11px 30px;
+          }
+        }
+        @media (max-width: 420px) {
+          .slide-container {
+            min-height: 260px;
+          }
+          .emotion-btn, .menu-btn {
+            font-size: 1em;
+            padding: 12px 10px;
+          }
+        }
+        #play-audio-btn {
+          display:none;
+          position:fixed;
+          bottom:30px;
+          left:50%;
+          transform:translateX(-50%);
+          z-index:1000;
+          padding:13px 38px;
+          font-size:1.1em;
+          border-radius:16px;
+          background:#2980b9;
+          color:#fff;
+          border:none;
+          box-shadow:0 2px 10px rgba(60,80,120,.14);
+          font-weight:600;
+        }
+        /* Ayat Quran dan terjemah agar lebih menonjol */
+        .ayat-arab {
+            display: block;
+            direction: rtl;
+            text-align: right;
+            font-family: "Amiri", "Scheherazade", "Traditional Arabic", serif;
+            font-size: 1.24em;
+            line-height: 1.81;
+            color: #1976d2;
+            margin-bottom: 7px;
+            margin-top: 4px;
+            letter-spacing: 0.02em;
+            unicode-bidi: embed;
+        }
+        .ayat-terjemah {
+            display: block;
+            direction: ltr;
+            text-align: left;
+            font-family: inherit;
+            font-size: 1.04em;
+            color: #222;
+            margin-bottom: 7px;
+            margin-top: 0px;
+        }
+        .ayat-sumber {
+            font-size: .97em;
+            color: #4b6ea7;
+            font-style: italic;
+            margin-bottom: 2px;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body>
+<div id="splash-page" class="centered fade-in">
+    <h1 style="font-size:4.5rem;margin:0;color:#2980b9;font-family:'Georgia',serif;">ق</h1>
+    <h2 style="margin-top:8px;font-weight:normal;">Qur'anic Feelings</h2>
+    <p style="margin-top:40px;font-size:1.1em;">Loading...</p>
+</div>
+
+<div id="main-menu" class="centered hidden fade-in">
+    <h2 style="margin-bottom:38px;color:var(--theme-color);">Qur'anic Feelings</h2>
+    <button class="menu-btn" id="btn-your-feelings">Your Feelings</button>
+    <button class="menu-btn" id="btn-settings-menu">Settings</button>
+    <button class="menu-btn" id="btn-about-menu">About</button>
+</div>
+
+<main id="feelings-page" class="hidden fade-in">
+    <button class="back-btn" style="margin-bottom:10px;" id="back-to-main-1">&larr; Back</button>
+    <div class="emotion-list" role="list" aria-label="Daftar perasaan">
+        <button class="emotion-btn" data-emotion="cemas" role="listitem" aria-pressed="false">Cemas</button>
+        <button class="emotion-btn" data-emotion="kesepian" role="listitem" aria-pressed="false">Kesepian</button>
+        <button class="emotion-btn" data-emotion="harapan" role="listitem" aria-pressed="false">Harapan</button>
+        <button class="emotion-btn" data-emotion="bersyukur" role="listitem" aria-pressed="false">Bersyukur</button>
+        <button class="emotion-btn" data-emotion="rasa_bersalah" role="listitem" aria-pressed="false">Rasa Bersalah</button>
+        <button class="emotion-btn" data-emotion="marah" role="listitem" aria-pressed="false">Marah</button>
+    </div>
+    <div class="slide-container" aria-live="polite" aria-atomic="true" tabindex="0" aria-label="Konten ayat dan penjelasan perasaan">
+        <div class="slide-verse-translation" id="slide-verse-translation">Pilih emosi untuk melihat ayat dan penjelasan.</div>
+        <div class="slide-explanation" id="slide-explanation"></div>
+        <div class="nav-slides-container">
+            <button id="prev-slide-btn" class="nav-btn" aria-label="Sebelumnya">&larr;</button>
+            <span id="slide-indicator"></span>
+            <button id="next-slide-btn" class="nav-btn" aria-label="Selanjutnya">&rarr;</button>
+        </div>
+        <div class="video-container" aria-label="Video YouTube terkait perasaan">
+            <div id="emotion-video"></div>
+        </div>
+        <audio id="background-audio" autoplay loop>
+            <source src="audio/audio-quranic-feelings.mp3" type="audio/mp3" />
+            Browser anda tidak mendukung elemen audio.
+        </audio>
+        <button id="play-audio-btn">🔊 Aktifkan Audio</button>
+    </div>
+</main>
+
+<main id="settings-page" class="hidden fade-in">
+    <button class="back-btn" style="margin-bottom:10px;" id="back-to-main-2">&larr; Back</button>
+    <div class="settings-group">
+        <label for="color-choice">Warna Tema</label>
+        <select id="color-choice" name="color-choice" aria-describedby="color-help">
+            <option value="#2980b9" selected>Biru</option>
+            <option value="#27ae60">Hijau</option>
+            <option value="#e67e22">Oranye</option>
+            <option value="#8e44ad">Ungu</option>
+            <option value="#c0392b">Merah</option>
+        </select>
+        <small id="color-help">Pilih warna utama aplikasi.</small>
+    </div>
+    <div class="settings-group">
+        <label for="font-size">Ukuran Huruf</label>
+        <input type="range" id="font-size" min="14" max="24" value="16" aria-valuemin="14" aria-valuemax="24" aria-valuenow="16" />
+        <small>Atur ukuran huruf isi ayat dan penjelasan.</small>
+    </div>
+    <div class="settings-group">
+        <label><input type="checkbox" id="sound-toggle" checked /> Aktifkan Bunyi Suara</label>
+    </div>
+    <div class="volume-group">
+        <div class="volume-label">
+            <label for="audio-volume">Volume Audio</label>
+            <span id="audio-volume-value">100%</span>
+        </div>
+        <input type="range" id="audio-volume" min="0" max="100" value="100" />
+    </div>
+</main>
+
+<main id="about-page" class="hidden fade-in">
+    <button class="back-btn" style="margin-bottom:10px;" id="back-to-main-3">&larr; Back</button>
+    <h3>Tentang Aplikasi</h3>
+    <div class="about">
+        <p>
+            Aplikasi ini merupakan output dari tugas mata kuliah Digitalisasi Al-Qur'an mahasiswa Ilmu Al-Qur'an dan Tafsir semester 6 IAI Persis Garut.<br />
+            Bertujuan membantu merenungkan perasaan manusia melalui ayat-ayat Al-Qur'an dengan penjelasan yang reflektif.
+        </p>
+    </div>
+</main>
+
+<footer>
+    &copy; 2025 Qur'anic Feelings
+</footer>
+
+<script>
+const feelingsData = {
+    cemas: [
+        {
+            arab: "وَأَنَّهُۥ هُوَ أَضْحَكَ وَأَبْكَى",
+            sumber: "An-Najm: 43",
+            terjemah: "Dan bahwasanya Dialah yang menjadikan orang tertawa dan menangis.",
+            explanation: "Allah menjadikan manusia tertawa dan menangis. Artinya, jika kamu sedang merasa cemas dan sedih, itu adalah hal yang manusiawi."
+        },
+        {
+            arab: "ٱلَّذِينَ ءَامَنُوا۟ وَتَطْمَئِنُّ قُلُوبُهُم بِذِكْرِ ٱللَّهِ ۗ أَلَا بِذِكْرِ ٱللَّهِ تَطْمَئِنُّ ٱلْقُلُوبُ",
+            sumber: "Ar-Ra'd: 28",
+            terjemah: "Yaitu orang-orang yang beriman dan hati mereka menjadi tenang dengan mengingat Allah. Ingatlah, hanya dengan mengingati Allah-lah hati menjadi tenteram.",
+            explanation: "Dzikir yang bisa dibaca saat cemas: Hasbunallah wa ni'mal wakiil & La hawla wa la quwwata illa billah."
+        },
+        {
+            arab: "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا. إِنَّ مَعَ الْعُسْرِ يُسْرًا",
+            sumber: "Al-Insyirah: 5-6",
+            terjemah: "Maka sesungguhnya bersama kesulitan ada kemudahan. Sesungguhnya bersama kesulitan ada kemudahan.",
+            explanation: "Setiap kesusahan selalu disertai kemudahan, jangan putus asa."
+        },
+        {
+            arab: "لَا يُكَلِّفُ اللّٰهُ نَفْسًا إِلَّا وُسْعَهَا",
+            sumber: "Al-Baqarah: 286",
+            terjemah: "Allah tidak membebani seseorang melainkan sesuai kesanggupannya ….",
+            explanation: "Allah tahu batas lelahmu. Setiap beban sudah diukur sesuai kekuatanmu. Jika terasa berat, bukan karena kamu lemah, tapi kamu sedang bertumbuh. Tenanglah, kamu tidak sendiri. Allah selalu bersamamu."
+        },
+        {
+            arab: "إِذْ يَقُولُ لِصَاحِبِهِ لَا تَحْزَنْ إِنَّ اللَّهَ مَعَنَا",
+            sumber: "At-Taubah: 40",
+            terjemah: 'Janganlah kamu berduka cita, sesungguhnya Allah beserta kita.',
+            explanation: "Dalam kondisi paling genting sekalipun, kehadiran Allah adalah penguat terbesar. Kecemasan tak akan bertahan lama jika hati terus menggenggam keyakinan bahwa Allah tidak pernah meninggalkan hamba-Nya."
+        }
+    ],
+    kesepian: [
+        {
+            arab: "وَإِذَا سَأَلَكَ عِبَادِى عَنِّى فَإِنِّى قَرِيبٌ",
+            sumber: "Al-Baqarah: 186",
+            terjemah: "Dan apabila hamba-hamba-Ku bertanya tentang Aku, maka Aku dekat. Aku mengabulkan permohonan orang yang berdoa apabila ia memohon kepada-Ku.",
+            explanation: "Allah selalu dekat kepada hamba-Nya, terutama di saat kesepian."
+        },
+        {
+            arab: "وَنَحْنُ أَقْرَبُ إِلَيْهِ مِنْ حَبْلِ الْوَرِيدِ",
+            sumber: "Qaf: 16",
+            terjemah: "Dan Kami lebih dekat kepadanya daripada urat lehernya.",
+            explanation: "Ketika dunia terasa jauh dan tak ada pelukan yang menyapa, ayat ini hadir seperti bisikan lembut: \"Aku lebih dekat dari urat lehermu\"."
+        },
+        {
+            arab: "وَهُوَ مَعَكُمْ أَيْنَ مَا كُنتُمْ",
+            sumber: "Al-Hadid: 4",
+            terjemah: "Dan Dia bersama kamu di mana saja kamu berada.",
+            explanation: "Kesepian terasa lebih ringan saat menyadari: kita tak pernah benar-benar sendiri. Allah senantiasa membersamai, bahkan dalam sunyi yang paling pekat."
+        }
+    ],
+    harapan: [
+        {
+            arab: "وَإِلَىٰ رَبِّكَ فَارْغَبْ",
+            sumber: "Al-Insyirah: 8",
+            terjemah: "Dan hanya kepada Tuhanmulah kamu berharap.",
+            explanation: "Ketika semua terasa berat, saat harapan pada manusia tak lagi memberi ketenangan, Allah memanggil kita dengan lembut: \"kepadaku tempat berharap\". Ini adalah panggilan untuk menaruh kepercayaan dan yakin bahwa setiap kesulitan pasti diiringi kemudahan."
+        },
+        {
+            arab: "وَمَن يَتَوَكَّلْ عَلَى اللَّهِ فَهُوَ حَسْبُهُ",
+            sumber: "At-Talaq: 3",
+            terjemah: "Dan barangsiapa yang bertawakkal kepada Allah niscaya Allah akan mencukupkan (keperluan)nya.",
+            explanation: "Harapan tak selalu datang dari hasil yang terlihat, tapi dari keyakinan dalam hati. Berserah kepada Allah bukan tanda putus asa, tapi wujud harapan yang paling tulus. Sebab saat kita bergantung pada-Nya, Allah akan mudahkan segala urusannya."
+        },
+        {
+            arab: "قُل لَّن يُصِيبَنَآ إِلَّا مَا كَتَبَ ٱللَّهُ لَنَا هُوَ مَوْلَىٰنَا",
+            sumber: "At-Taubah: 51",
+            terjemah: "Sekali-kali tidak akan menimpa kami melainkan apa yang telah ditetapkan Allah untuk kami. Dialah Pelindung kami.",
+            explanation: "Apa pun yang terjadi, adalah bagian dari rencana Allah yang sempurna. Maka, kepada-Nya lah orang-orang beriman menggantungkan harapan dan bertawakal sepenuhnya."
+        },
+        {
+            arab: "إِنَّ رَحْمَتَ اللَّهِ قَرِيبٌ مِّنَ الْمُحْسِنِينَ",
+            sumber: "Al-A'raf: 56",
+            terjemah: "Sesungguhnya rahmat Allah amat dekat kepada orang-orang yang berbuat baik.",
+            explanation: "Di balik setiap doa yang lirih dan usaha yang jujur, ada rahmat Allah yang tak pernah jauh. Jangan lelah berbuat baik, meski dunia tampak sunyi membalas. Sebab rahmat Allah tak pernah jauh dari hati yang tulus."
+        }
+    ],
+    bersyukur: [
+        {
+            arab: "لَئِن شَكَرْتُمْ لَأَزِيدَنَّكُمْ",
+            sumber: "Ibrahim: 7",
+            terjemah: "Sesungguhnya jika kamu bersyukur, pasti Kami akan menambah (nikmat) kepadamu.",
+            explanation: "Bersyukur membuka pintu bertambahnya nikmat."
+        },
+        {
+            arab: "وَإِن تَعُدُّوا نِعْمَةَ اللَّهِ لَا تُحْصُوهَا",
+            sumber: "An-Nahl: 18",
+            terjemah: "Dan jika kamu menghitung-hitung nikmat Allah, niscaya kamu tak dapat menentukan jumlahnya.",
+            explanation: "Ketika hati dipenuhi rasa syukur, kita mulai menyadari betapa luasnya nikmat Allah. Tak akan mampu kita menghitungnya."
+        },
+        {
+            arab: "وَسَنَجْزِي الشَّاكِرِينَ",
+            sumber: "Ali Imran: 145",
+            terjemah: "Dan Kami akan memberi balasan kepada orang-orang yang bersyukur.",
+            explanation: "Setiap waktu, kesempatan untuk berbuat baik dan kesempatan untuk mendekat kepada-Nya adalah anugerah berharga."
+        },
+        {
+            arab: "فَاذْكُرُونِي أَذْكُرْكُمْ وَاشْكُرُوا لِي وَلَا تَكْفُرُونِ",
+            sumber: "Al-Baqarah: 152",
+            terjemah: "Karena itu, ingatlah kamu kepada-Ku niscaya Aku ingat (pula) kepadamu, dan bersyukurlah kepada-Ku, dan janganlah kamu mengingkari (nikmat)-Ku.",
+            explanation: "Syukur bukan hanya respons atas nikmat, tapi juga jalan untuk lebih dekat kepada-Nya."
+        }
+    ],
+    rasa_bersalah: [
+        {
+            arab: "إِلَّا مَن تَابَ وَآمَنَ وَعَمِلَ عَمَلًا صَالِحًا فَأُولَٰئِكَ يُبَدِّلُ اللَّهُ سَيِّئَاتِهِمْ حَسَنَاتٍ",
+            sumber: "Al-Furqan: 70",
+            terjemah: "Kecuali orang-orang yang bertaubat, beriman dan mengerjakan amal saleh; maka itu kejahatan mereka diganti Allah dengan kebajikan.",
+            explanation: "Allah mampu mengubah luka masa lalu menjadi cahaya kebaikan. Taubat yang tulus membuka jalan baru yang penuh ampunan."
+        },
+        {
+            arab: "أَنَّ اللَّهَ هُوَ يَقْبَلُ التَّوْبَةَ عَنْ عِبَادِهِ",
+            sumber: "At-Taubah: 104",
+            terjemah: "Bahwasanya Allah menerima taubat dari hamba-hamba-Nya.",
+            explanation: "Meski diri pernah salah, tetap ada ruang untuk bangkit, memohon ampun, dan memperbaiki langkah dengan penuh keikhlasan."
+        },
+        {
+            arab: "لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ ۚ إِنَّ اللَّهَ يَغْفِرُ الذُّنُوبَ جَمِيعًا",
+            sumber: "Az-Zumar: 53",
+            terjemah: "Janganlah kamu berputus asa dari rahmat Allah. Sesungguhnya Allah mengampuni dosa-dosa semuanya.",
+            explanation: "Seberat apa pun dosamu, seluas apa pun penyesalanmu, jangan putus asa dari rahmat Allah. Dia Maha Pengampun, selalu membuka pintu kembali bagi hamba yang ingin pulang."
+        },
+        {
+            arab: "رَبَّنَا ظَلَمْنَا أَنفُسَنَا وَإِن لَّمْ تَغْفِرْ لَنَا وَتَرْحَمْنَا لَنَكُونَنَّ مِنَ الْخَاسِرِينَ",
+            sumber: "Al-A'raf: 23",
+            terjemah: "Ya Tuhan kami, kami telah menzalimi diri kami sendiri, dan jika Engkau tidak mengampuni dan memberi rahmat kepada kami, tentulah kami termasuk orang-orang yang merugi.",
+            explanation: "Sebuah doa penyerahan diri, mengakui kesalahan dan berharap ampunan."
+        }
+    ],
+    marah: [
+        {
+            arab: "وَالْكَاظِمِينَ الْغَيْظَ وَالْعَافِينَ عَنِ النَّاسِ",
+            sumber: "Ali Imran: 134",
+            terjemah: "Yaitu orang-orang yang menahan amarahnya dan memaafkan (kesalahan) orang.",
+            explanation: "Mengendalikan amarah dan memberi maaf adalah sebab dicintai Allah."
+        },
+        {
+            arab: "إِنَّمَا الْمُؤْمِنُونَ الَّذِينَ إِذَا ذُكِرَ اللَّهُ وَجِلَتْ قُلُوبُهُمْ",
+            sumber: "Al-Anfal: 2",
+            terjemah: "Sesungguhnya orang-orang beriman itu ialah orang-orang yang apabila disebut nama Allah gemetarlah hati mereka.",
+            explanation: "Keimanan membentuk hati yang takut tapi tenang, dan menenangkan amarah."
+        },
+        {
+            arab: "وَالَّذِينَ إِذَا أَصَابَهُمُ الْبَغْيُ هُمْ يَنتَصِرُونَ",
+            sumber: "Ash-Shura: 39",
+            terjemah: "Dan orang-orang yang apabila mereka mendapat perbuatan zalim, mereka membalas dengan cara yang sebaik-baiknya (atau membela diri).",
+            explanation: "Melawan amarah dengan kebaikan dan ketegasan yang bijak."
+        },
+        {
+            arab: "فَاصْفَحِ الصَّفْحَ الْجَمِيلَ",
+            sumber: "Al-Muzzammil: 10",
+            terjemah: "Maka maafkanlah dengan cara yang baik.",
+            explanation: "Kunci menghadapi kemarahan adalah dengan memaafkan dan bersikap indah."
+        }
+    ]
+};
+const emotionVideos = {
+    cemas: "https://youtube.com/embed/WgPEi-7d4Gs?autoplay=0",
+    kesepian: "https://youtube.com/embed/4SKOMJZ5fVg?autoplay=0",
+    harapan: "https://www.youtube.com/embed/7KTuibxpgv8?autoplay=0",
+    bersyukur: "https://www.youtube.com/embed/zxr9UWn0ZxM?autoplay=0",
+    rasa_bersalah: "https://youtube.com/embed/Rh_vThqNgGs?autoplay=0",
+    marah: "https://youtube.com/embed/3SPEufl0RJQ?autoplay=0"
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        document.getElementById('splash-page').classList.add('hidden');
+        document.getElementById('main-menu').classList.remove('hidden');
+    }, 1500);
+
+    const showPage = (page) => {
+        document.getElementById('main-menu').classList.add('hidden');
+        document.getElementById('feelings-page').classList.add('hidden');
+        document.getElementById('settings-page').classList.add('hidden');
+        document.getElementById('about-page').classList.add('hidden');
+        if(page === 'main-menu') document.getElementById('main-menu').classList.remove('hidden');
+        if(page === 'feelings-page') document.getElementById('feelings-page').classList.remove('hidden');
+        if(page === 'settings-page') document.getElementById('settings-page').classList.remove('hidden');
+        if(page === 'about-page') document.getElementById('about-page').classList.remove('hidden');
+    };
+
+    // Tombol Aktifkan Audio untuk mobile
+    const backgroundAudio = document.getElementById('background-audio');
+    const playAudioBtn = document.getElementById('play-audio-btn');
+    function showPlayAudioButtonIfNeeded() {
+        backgroundAudio.play().then(() => {
+            playAudioBtn.style.display = "none";
+        }).catch(() => {
+            playAudioBtn.style.display = "";
+        });
+    }
+    playAudioBtn.onclick = function() {
+        backgroundAudio.muted = false;
+        backgroundAudio.play().then(()=>{
+            playAudioBtn.style.display = "none";
+        });
+    };
+
+    document.getElementById('btn-your-feelings').onclick = () => {
+        showPage('feelings-page');
+        document.querySelector('.emotion-btn[data-emotion="cemas"]').click();
+        showPlayAudioButtonIfNeeded();
+    };
+    document.getElementById('btn-settings-menu').onclick = () => {
+        showPage('settings-page');
+        showPlayAudioButtonIfNeeded();
+    };
+    document.getElementById('btn-about-menu').onclick = () => {
+        showPage('about-page');
+        showPlayAudioButtonIfNeeded();
+    };
+    document.getElementById('back-to-main-1').onclick = () => {
+        showPage('main-menu');
+        showPlayAudioButtonIfNeeded();
+    };
+    document.getElementById('back-to-main-2').onclick = () => {
+        showPage('main-menu');
+        showPlayAudioButtonIfNeeded();
+    };
+    document.getElementById('back-to-main-3').onclick = () => {
+        showPage('main-menu');
+        showPlayAudioButtonIfNeeded();
+    };
+
+    let currentEmotion = '';
+    let currentSlideIndex = 0;
+    const emotionBtns = document.querySelectorAll('.emotion-btn');
+    const slideVerseTranslationEl = document.getElementById('slide-verse-translation');
+    const slideExplainEl = document.getElementById('slide-explanation');
+    const soundToggle = document.getElementById('sound-toggle');
+    const audioVolume = document.getElementById('audio-volume');
+    const audioVolumeValue = document.getElementById('audio-volume-value');
+    const prevSlideBtn = document.getElementById('prev-slide-btn');
+    const nextSlideBtn = document.getElementById('next-slide-btn');
+    const slideIndicator = document.getElementById('slide-indicator');
+
+    function selectEmotion(emotion){
+        currentEmotion = emotion;
+        currentSlideIndex = 0;
+        renderSlide();
+        emotionBtns.forEach(btn=>{
+            const active = btn.getAttribute('data-emotion') === emotion;
+            btn.classList.toggle('active', active);
+            btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+    }
+    function renderSlide(){
+        const slides = feelingsData[currentEmotion];
+        if (!slides || slides.length === 0){
+            slideVerseTranslationEl.textContent = "Data tidak tersedia.";
+            slideExplainEl.textContent = "";
+            setYouTubeVideo("");
+            backgroundAudio.pause();
+            prevSlideBtn.disabled = true;
+            nextSlideBtn.disabled = true;
+            slideIndicator.textContent = "";
+            return;
+        }
+        if (currentSlideIndex < 0) currentSlideIndex = 0;
+        if (currentSlideIndex >= slides.length) currentSlideIndex = slides.length - 1;
+
+        const slide = slides[currentSlideIndex];
+
+        // Format ayat arab dan terjemah
+        slideVerseTranslationEl.innerHTML = `
+            <span class="ayat-arab">${slide.arab}</span>
+            <span class="ayat-sumber">${slide.sumber}</span>
+            <span class="ayat-terjemah">${slide.terjemah}</span>
+        `;
+        slideExplainEl.textContent = slide.explanation;
+        setYouTubeVideo(emotionVideos[currentEmotion] || "");
+        if(soundToggle.checked){
+            backgroundAudio.play().catch(()=>{});
+            showPlayAudioButtonIfNeeded();
+        }
+        slideIndicator.textContent = (slides.length > 1) ? ((currentSlideIndex+1) + " / " + slides.length) : "";
+        prevSlideBtn.disabled = (currentSlideIndex === 0);
+        nextSlideBtn.disabled = (currentSlideIndex === slides.length-1);
+    }
+    emotionBtns.forEach(btn=>{
+        btn.addEventListener('click', () => {
+            selectEmotion(btn.getAttribute('data-emotion'));
+            showPlayAudioButtonIfNeeded();
+        });
+    });
+
+    prevSlideBtn.onclick = function() {
+        currentSlideIndex--;
+        renderSlide();
+    };
+    nextSlideBtn.onclick = function() {
+        currentSlideIndex++;
+        renderSlide();
+    };
+
+    document.addEventListener('keydown', function(e) {
+        if (!document.getElementById('feelings-page').classList.contains('hidden')) {
+            if (e.key === "ArrowLeft" && !prevSlideBtn.disabled) {
+                e.preventDefault();
+                prevSlideBtn.click();
+            }
+            if (e.key === "ArrowRight" && !nextSlideBtn.disabled) {
+                e.preventDefault();
+                nextSlideBtn.click();
+            }
+        }
+    });
+
+    function applyThemeColor(color){
+        document.documentElement.style.setProperty('--theme-color', color);
+        Array.from(document.querySelectorAll('.menu-btn,.emotion-btn')).forEach(el => {
+            el.style.backgroundColor = color;
+        });
+    }
+    document.getElementById('color-choice').addEventListener('change', (e) => {
+        applyThemeColor(e.target.value);
+    });
+    document.getElementById('font-size').addEventListener('input', (e) => {
+        const size = e.target.value + 'px';
+        slideVerseTranslationEl.style.fontSize = size;
+        slideExplainEl.style.fontSize = size;
+    });
+    soundToggle.addEventListener('change', (e) => {
+        if(e.target.checked){
+            backgroundAudio.muted = false;
+            backgroundAudio.play().catch(()=>{});
+            showPlayAudioButtonIfNeeded();
+        } else {
+            backgroundAudio.muted = true;
+            backgroundAudio.pause();
+        }
+    });
+    audioVolume.addEventListener('input', (e) => {
+        const value = e.target.value;
+        backgroundAudio.volume = value / 100;
+        audioVolumeValue.textContent = value + "%";
+    });
+    backgroundAudio.volume = audioVolume.value / 100;
+    audioVolumeValue.textContent = audioVolume.value + "%";
+    backgroundAudio.muted = !soundToggle.checked;
+
+    let ytPlayer = null;
+    let youtubeReady = false;
+    let pendingVideoId = null;
+    function setYouTubeVideo(url) {
+        const videoId = getYouTubeVideoId(url);
+        const container = document.getElementById('emotion-video');
+        if (!videoId) {
+            if (ytPlayer) {
+                ytPlayer.destroy();
+                ytPlayer = null;
+            }
+            container.innerHTML = '';
+            return;
+        }
+        if (ytPlayer) {
+            ytPlayer.destroy();
+            ytPlayer = null;
+            container.innerHTML = '';
+        }
+        if (!youtubeReady) {
+            pendingVideoId = videoId;
+            container.innerHTML = '';
+            return;
+        }
+        ytPlayer = new YT.Player('emotion-video', {
+            videoId: videoId,
+            width: '100%',
+            height: '100%',
+            playerVars: {
+                rel: 0,
+                modestbranding: 1,
+                autoplay: 0
+            },
+            events: {
+                'onStateChange': function(event) {
+                    if(event.data === YT.PlayerState.PLAYING) {
+                        backgroundAudio.pause();
+                    } else if(event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
+                        if(soundToggle.checked){
+                            backgroundAudio.play().catch(()=>{});
+                            showPlayAudioButtonIfNeeded();
+                        }
+                    }
+                }
+            }
+        });
+    }
+    function getYouTubeVideoId(url) {
+        const match = url.match(/embed\/([A-Za-z0-9_-]+)/);
+        return match ? match[1] : "";
+    }
+    window.onYouTubeIframeAPIReady = function() {
+        youtubeReady = true;
+        if(pendingVideoId) {
+            setYouTubeVideo('https://www.youtube.com/embed/' + pendingVideoId);
+            pendingVideoId = null;
+        }
+    };
+    (function(){
+        if (!window.YT) {
+            var tag = document.createElement('script');
+            tag.src = "https://www.youtube.com/iframe_api";
+            document.body.appendChild(tag);
+        } else {
+            window.onYouTubeIframeAPIReady();
+        }
+    })();
+
+    document.getElementById('emotion-video').addEventListener("mousedown", function() {
+        backgroundAudio.pause();
+    });
+    document.getElementById('emotion-video').addEventListener("touchstart", function() {
+        backgroundAudio.pause();
+    });
+    document.getElementById('emotion-video').addEventListener("focus", function() {
+        backgroundAudio.pause();
+    });
+
+    applyThemeColor(document.getElementById('color-choice').value);
+    document.getElementById('font-size').dispatchEvent(new Event('input'));
+});
+</script>
+</body>
+</html>
